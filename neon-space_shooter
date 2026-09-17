@@ -1,0 +1,213 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <conio.h>
+#include <windows.h>
+
+using namespace std;
+
+const int WIDTH = 40;
+const int HEIGHT = 20;
+
+class SpaceShooter
+{
+public:
+    int playerX;
+    int playerY;
+    int enemyX;
+    int enemyY;
+    int bulletX;
+    int bulletY;
+    int score;
+    int lives;
+    bool bulletActive;
+    bool gameOver;
+
+    SpaceShooter()
+    {
+        playerX = WIDTH / 2;
+        playerY = HEIGHT - 2;
+
+        enemyX = rand() % (WIDTH - 2) + 1;
+        enemyY = 1;
+
+        bulletX = 0;
+        bulletY = 0;
+
+        score = 0;
+        lives = 3;
+
+        bulletActive = false;
+        gameOver = false;
+    }
+
+    void draw()
+    {
+        system("cls");
+
+        cout << "========================================" << endl;
+        cout << "        🚀 NEON SPACE SHOOTER 🚀       " << endl;
+        cout << "========================================" << endl;
+
+        cout << "Score: " << score;
+        cout << "     Lives: " << lives << endl;
+
+        cout << "+" << string(WIDTH, '-') << "+" << endl;
+
+        for (int y = 0; y < HEIGHT; y++)
+        {
+            cout << "|";
+
+            for (int x = 0; x < WIDTH; x++)
+            {
+                if (x == playerX && y == playerY)
+                {
+                    cout << "^";
+                }
+                else if (x == bulletX && y == bulletY && bulletActive)
+                {
+                    cout << "|";
+                }
+                else if (x == enemyX && y == enemyY)
+                {
+                    cout << "V";
+                }
+                else
+                {
+                    if (rand() % 25 == 0)
+                        cout << ".";
+                    else
+                        cout << " ";
+                }
+            }
+
+            cout << "|" << endl;
+        }
+
+        cout << "+" << string(WIDTH, '-') << "+" << endl;
+
+        cout << "A/D = Move   SPACE = Shoot   Q = Quit" << endl;
+    }
+
+    void movePlayer()
+    {
+        if (_kbhit())
+        {
+            char key = _getch();
+
+            if (key == 'a' || key == 'A')
+            {
+                if (playerX > 1)
+                    playerX--;
+            }
+
+            if (key == 'd' || key == 'D')
+            {
+                if (playerX < WIDTH - 2)
+                    playerX++;
+            }
+
+            if (key == ' ')
+            {
+                if (!bulletActive)
+                {
+                    bulletX = playerX;
+                    bulletY = playerY - 1;
+                    bulletActive = true;
+                }
+            }
+
+            if (key == 'q' || key == 'Q')
+            {
+                gameOver = true;
+            }
+        }
+    }
+
+    void updateBullet()
+    {
+        if (bulletActive)
+        {
+            bulletY--;
+
+            if (bulletY <= 0)
+            {
+                bulletActive = false;
+            }
+
+            if (bulletX == enemyX &&
+                bulletY == enemyY)
+            {
+                score += 10;
+
+                bulletActive = false;
+
+                resetEnemy();
+            }
+        }
+    }
+
+    void updateEnemy()
+    {
+        enemyY++;
+
+        if (enemyY >= HEIGHT - 1)
+        {
+            lives--;
+
+            resetEnemy();
+
+            if (lives <= 0)
+            {
+                gameOver = true;
+            }
+        }
+    }
+
+    void resetEnemy()
+    {
+        enemyX = rand() % (WIDTH - 2) + 1;
+        enemyY = 1;
+    }
+
+    void run()
+    {
+        srand(time(0));
+
+        while (!gameOver)
+        {
+            draw();
+
+            movePlayer();
+
+            updateBullet();
+
+            updateEnemy();
+
+            Sleep(100);
+        }
+
+        system("cls");
+
+        cout << endl;
+        cout << "========================================" << endl;
+        cout << "             GAME OVER 💥               " << endl;
+        cout << "========================================" << endl;
+
+        cout << endl;
+        cout << "Player: Abhilash Kakde" << endl;
+        cout << "Final Score: " << score << endl;
+        cout << endl;
+
+        cout << "Thanks for playing!" << endl;
+    }
+};
+
+int main()
+{
+    SpaceShooter game;
+
+    game.run();
+
+    return 0;
+}
